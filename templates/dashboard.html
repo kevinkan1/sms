@@ -1,0 +1,159 @@
+{% extends "base.html" %}
+{% block title %}Dashboard{% endblock %}
+{% block breadcrumb %}Dashboard{% endblock %}
+{% block content %}
+
+<!-- Section: Page Heading -->
+<section class="page-heading">
+ <div>
+  <div class="eyebrow">RINGKASAN SISTEM</div>
+  <h1>Dashboard Analisis SMS</h1>
+  <p>Pantau hasil klasifikasi pesan SMS yang telah dianalisis oleh model AI.</p>
+ </div>
+ <a class="btn btn-primary" href="/analyze">＋ Analisis SMS Baru</a>
+</section>
+
+<!-- Section: Stats Grid -->
+<section class="stats-grid">
+ <article class="stat-card">
+  <div class="stat-top">
+   <span>Total SMS</span>
+   <span class="stat-icon dark">▤</span>
+  </div>
+  <div class="stat-number">{{ total }}</div>
+  <div class="stat-note">Seluruh pesan tersimpan</div>
+ </article>
+ <article class="stat-card">
+  <div class="stat-top">
+   <span>Pesan Ham</span>
+   <span class="stat-icon green">✓</span>
+  </div>
+  <div class="stat-number">{{ ham_count }}</div>
+  <div class="stat-note">Pesan normal</div>
+ </article>
+ <article class="stat-card">
+  <div class="stat-top">
+   <span>Pesan Spam</span>
+   <span class="stat-icon red">!</span>
+  </div>
+  <div class="stat-number">{{ spam_count }}</div>
+  <div class="stat-note">Pesan terindikasi spam</div>
+ </article>
+ <article class="stat-card">
+  <div class="stat-top">
+   <span>Persentase Spam</span>
+   <span class="stat-icon yellow">%</span>
+  </div>
+  <div class="stat-number">{{ spam_rate }}%</div>
+  <div class="stat-note">Dari seluruh hasil analisis</div>
+ </article>
+</section>
+
+<!-- Section: Dashboard Grid (Prediction Composition & Spam Words Insight) -->
+<section class="dashboard-grid">
+ <article class="panel">
+  <div class="panel-heading">
+   <div>
+    <h2>Komposisi Hasil Prediksi</h2>
+    <p>Distribusi data yang sudah dianalisis</p>
+   </div>
+  </div>
+  {% if total %}
+  <div class="bar-summary">
+   <div class="bar-label">
+    <span>Ham</span>
+    <strong>{{ ham_count }}</strong>
+   </div>
+   <div class="bar-track">
+    <div class="bar-fill ham-fill" style="width: {{ (ham_count / total * 100) if total else 0 }}%"></div>
+   </div>
+   <div class="bar-label">
+    <span>Spam</span>
+    <strong>{{ spam_count }}</strong>
+   </div>
+   <div class="bar-track">
+    <div class="bar-fill spam-fill" style="width: {{ (spam_count / total * 100) if total else 0 }}%"></div>
+   </div>
+   <div class="legend">
+    <span><i class="legend-dot ham-dot"></i> Ham</span>
+    <span><i class="legend-dot spam-dot"></i> Spam</span>
+   </div>
+  </div>
+  {% else %}
+  <div class="empty-state">
+   <span class="empty-icon">▤</span>
+   <strong>Belum ada data analisis</strong>
+   <p>Masukkan SMS pertama untuk mulai melihat statistik.</p>
+   <a href="/analyze" class="btn btn-primary">Analisis SMS</a>
+  </div>
+  {% endif %}
+ </article>
+
+ <article class="panel">
+  <div class="panel-heading">
+   <div>
+    <h2>Insight Kata Spam</h2>
+    <p>Kata yang sering muncul pada hasil berlabel spam</p>
+   </div>
+  </div>
+  {% if top_spam_words %}
+  <div class="word-list">
+   {% for word, count in top_spam_words %}
+   <div class="word-row">
+    <span>{{ word }}</span>
+    <strong>{{ count }}</strong>
+   </div>
+   {% endfor %}
+  </div>
+  {% else %}
+  <div class="empty-state compact">
+   <span class="empty-icon">⌕</span>
+   <strong>Insight belum tersedia</strong>
+   <p>Insight akan muncul setelah pesan spam tersimpan.</p>
+  </div>
+  {% endif %}
+  <p class="small-muted">Insight dihitung dari pesan yang telah dianalisis dan tersimpan di aplikasi.</p>
+ </article>
+</section>
+
+<!-- Section: Recent Analysis Table -->
+<section class="panel">
+ <div class="panel-heading">
+  <div>
+   <h2>Analisis Terbaru</h2>
+   <p>Lima hasil analisis terakhir</p>
+  </div>
+  <a class="text-link" href="/history-page">Lihat semua →</a>
+ </div>
+ {% if recent_records %}
+ <div class="table-wrap">
+  <table>
+   <thead>
+    <tr>
+     <th>ID</th>
+     <th>Pesan SMS</th>
+     <th>Prediksi</th>
+     <th>Waktu Analisis</th>
+    </tr>
+   </thead>
+   <tbody>
+    {% for row in recent_records %}
+    <tr>
+     <td class="id-cell">#{{ row.id }}</td>
+     <td class="message-cell">{{ row.message_text }}</td>
+     <td>
+      <span class="badge {{ 'badge-spam' if row.prediction_label == 'spam' else 'badge-ham' }}">
+       {{ row.prediction_label|upper }}
+      </span>
+     </td>
+     <td class="date-cell">{{ row.created_at.strftime('%d-%m-%Y %H:%M') if row.created_at else '-' }}</td>
+    </tr>
+    {% endfor %}
+   </tbody>
+  </table>
+ </div>
+ {% else %}
+ <div class="empty-inline">Belum ada riwayat prediksi.</div>
+ {% endif %}
+</section>
+{% endblock %}

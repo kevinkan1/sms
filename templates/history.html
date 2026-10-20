@@ -1,0 +1,83 @@
+{% extends "base.html" %}
+{% block title %}Riwayat Prediksi{% endblock %}
+{% block breadcrumb %}Riwayat Prediksi{% endblock %}
+{% block content %}
+
+<!-- Section: Page Heading -->
+<section class="page-heading">
+ <div>
+  <div class="eyebrow">DATA ANALISIS</div>
+  <h1>Riwayat Prediksi</h1>
+  <p>Telusuri, perbarui, dan hapus data SMS yang telah dianalisis.</p>
+ </div>
+ <a class="btn btn-primary" href="/analyze">＋ Analisis SMS Baru</a>
+</section>
+
+<!-- Section: History Panel and Data Table -->
+<section class="panel">
+ 
+ <!-- Search and Filter Form -->
+ <form method="get" action="/history-page" class="search-form">
+  <div class="search-input">
+   <span>⌕</span>
+   <input type="search" name="q" value="{{ q }}" placeholder="Cari teks SMS, label, atau ID...">
+  </div>
+  <button class="btn btn-dark" type="submit">Cari</button>
+  {% if q %}
+  <a class="btn btn-outline" href="/history-page">Reset</a>
+  {% endif %}
+ </form>
+
+ {% if records %}
+ <div class="table-wrap">
+  <table>
+   <thead>
+    <tr>
+     <th>ID</th>
+     <th>Pesan SMS</th>
+     <th>Prediksi</th>
+     <th>Dibuat</th>
+     <th>Diperbarui</th>
+     <th class="action-heading">Aksi</th>
+    </tr>
+   </thead>
+   <tbody>
+    {% for row in records %}
+    <tr>
+     <td class="id-cell">#{{ row.id }}</td>
+     <td class="message-cell">{{ row.message_text }}</td>
+     <td>
+      <span class="badge {{ 'badge-spam' if row.prediction_label == 'spam' else 'badge-ham' }}">
+       {{ row.prediction_label|upper }}
+      </span>
+     </td>
+     <td class="date-cell">{{ row.created_at.strftime('%d-%m-%Y %H:%M') if row.created_at else '-' }}</td>
+     <td class="date-cell">{{ row.updated_at.strftime('%d-%m-%Y %H:%M') if row.updated_at else '-' }}</td>
+     <td>
+      <div class="action-buttons">
+       <a class="btn btn-small btn-outline" href="/edit/{{ row.id }}">Edit</a>
+       <form method="post" action="/remove/{{ row.id }}" onsubmit="return confirm('Hapus data SMS #{{ row.id }}?')">
+        <button class="btn btn-small btn-danger" type="submit">Hapus</button>
+       </form>
+      </div>
+     </td>
+    </tr>
+    {% endfor %}
+   </tbody>
+  </table>
+ </div>
+ {% else %}
+ <div class="empty-state">
+  <span class="empty-icon">⌕</span>
+  <strong>Data tidak ditemukan</strong>
+  <p>{% if q %}Coba kata kunci pencarian lain.{% else %}Belum ada SMS yang dianalisis.{% endif %}</p>
+ </div>
+ {% endif %}
+
+ <div class="table-footer">
+  <span>Menampilkan {{ records|length }} data{% if q %} untuk pencarian “{{ q }}”{% endif %}</span>
+ </div>
+
+</section>
+
+{% endblock %}

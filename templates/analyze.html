@@ -1,0 +1,99 @@
+{% extends "base.html" %}
+{% block title %}Analisis SMS{% endblock %}
+{% block breadcrumb %}Analisis SMS{% endblock %}
+{% block content %}
+
+<!-- Section: Page Heading -->
+<section class="page-heading">
+ <div>
+  <div class="eyebrow">MACHINE LEARNING</div>
+  <h1>Analisis SMS</h1>
+  <p>Masukkan pesan untuk mengetahui apakah pesan tersebut normal atau berpotensi spam.</p>
+ </div>
+</section>
+
+<!-- Layout: Form and Info Panel -->
+<div class="form-layout">
+ 
+ <!-- Section: Main Analyze Form Panel -->
+ <section class="panel analyze-panel">
+  <div class="panel-heading">
+   <div>
+    <h2>Masukkan Pesan SMS</h2>
+    <p>Model akan menganalisis teks dan menyimpan hasilnya ke PostgreSQL.</p>
+   </div>
+   <span class="stat-icon yellow">✉</span>
+  </div>
+
+  {% if error %}
+  <div class="alert alert-error">{{ error }}</div>
+  {% endif %}
+
+  <form method="post" action="/analyze">
+   <label for="message_text">Teks pesan <span class="required">*</span></label>
+   <textarea id="message_text" name="message_text" rows="7" maxlength="10000" required placeholder="Contoh: Congratulations! You have won a free prize...">{{ message_text }}</textarea>
+   
+   <div class="field-hint">Maksimal 10.000 karakter. Hindari memasukkan informasi pribadi sensitif.</div>
+   
+   <div class="form-actions">
+    <button class="btn btn-primary" type="submit">✦ Analisis dan Simpan</button>
+    <button class="btn btn-outline" type="reset">Bersihkan</button>
+   </div>
+  </form>
+
+  {% if result %}
+  <div class="result-box {{ 'result-spam' if result.prediction_label == 'spam' else 'result-ham' }}">
+   <div class="result-symbol">{{ '!' if result.prediction_label == 'spam' else '✓' }}</div>
+   <div class="result-content">
+    <span class="result-caption">HASIL KLASIFIKASI</span>
+    <h2>{{ result.prediction_label|upper }}</h2>
+    <p>
+     {% if result.prediction_label == 'spam' %}
+     Pesan ini terindikasi sebagai spam. Periksa tautan, permintaan pembayaran, atau informasi hadiah dengan hati-hati.
+     {% else %}
+     Pesan ini diklasifikasikan sebagai ham (pesan normal) oleh model.
+     {% endif %}
+    </p>
+    <small>Data tersimpan dengan ID #{{ result.id }}</small>
+   </div>
+  </div>
+  {% endif %}
+ </section>
+
+ <!-- Aside: Information & Steps Panel -->
+ <aside class="panel info-panel">
+  <h2>Bagaimana sistem bekerja?</h2>
+  
+  <div class="info-step">
+   <span>1</span>
+   <div>
+    <strong>Input teks</strong>
+    <p>Pesan SMS dimasukkan melalui formulir ini.</p>
+   </div>
+  </div>
+  
+  <div class="info-step">
+   <span>2</span>
+   <div>
+    <strong>Analisis model</strong>
+    <p>TF-IDF mengubah teks menjadi fitur dan Naive Bayes melakukan klasifikasi.</p>
+   </div>
+  </div>
+  
+  <div class="info-step">
+   <span>3</span>
+   <div>
+    <strong>Simpan hasil</strong>
+    <p>Teks, label prediksi, dan waktu disimpan ke PostgreSQL.</p>
+   </div>
+  </div>
+  
+  <div class="notice-box">
+   <strong>Catatan</strong>
+   <p>Hasil model adalah indikasi otomatis, bukan jaminan bahwa suatu pesan pasti aman atau berbahaya.</p>
+  </div>
+ </aside>
+
+</div>
+
+{% endblock %}

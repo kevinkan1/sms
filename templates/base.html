@@ -1,0 +1,89 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+ <meta charset="UTF-8">
+ <meta name="viewport" content="width=device-width, initial-scale=1.0">
+ <title>{% block title %}SMS Guard{% endblock %} | Intelligent Text Analysis</title>
+ <link rel="stylesheet" href="{{ url_for('static', path='/css/style.css') }}">
+</head>
+<body>
+
+<div class="app-shell">
+ 
+ <!-- Sidebar Navigation -->
+ <aside class="sidebar" id="sidebar">
+  <a class="brand" href="/">
+   <span class="brand-mark">SG</span>
+   <span><strong>SMS Guard</strong><small>INTELLIGENT TEXT ANALYSIS</small></span>
+  </a>
+  
+  <div class="nav-caption">MENU UTAMA</div>
+  
+  <nav class="nav-menu">
+   <a class="nav-link {% if active_page == 'dashboard' %}active{% endif %}" href="/">
+    <span class="nav-icon">▦</span> Dashboard
+   </a>
+   <a class="nav-link {% if active_page == 'analyze' %}active{% endif %}" href="/analyze">
+    <span class="nav-icon">✉</span> Analisis SMS
+   </a>
+   <a class="nav-link {% if active_page == 'history' %}active{% endif %}" href="/history-page">
+    <span class="nav-icon">◷</span> Riwayat Prediksi
+   </a>
+  </nav>
+
+  <div class="sidebar-bottom">
+   <div class="status-dot"></div>
+   <div><strong>Model AI aktif</strong><small>Naive Bayes + TF-IDF</small></div>
+  </div>
+ </aside>
+
+ <!-- Main Content Area -->
+ <div class="main-area">
+  
+  <!-- Topbar Header -->
+  <header class="topbar">
+   <button class="menu-toggle" type="button" onclick="document.body.classList.toggle('sidebar-open')" aria-label="Buka menu">☰</button>
+   <div class="breadcrumb">Workspace <span>/</span> <strong>{% block breadcrumb %}Dashboard{% endblock %}</strong></div>
+   <div class="topbar-right">
+    <span class="online-dot"></span>
+    <span>Sistem siap digunakan</span>
+   </div>
+  </header>
+
+  <!-- Main Body Content & Footer -->
+  <main class="content">
+   {% block content %}{% endblock %}
+   <footer class="footer">SMS Guard · Intelligent Text Analysis System</footer>
+  </main>
+  
+ </div>
+
+</div>
+
+<!-- Sidebar Overlay for Mobile View -->
+<div class="sidebar-overlay" onclick="document.body.classList.remove('sidebar-open')"></div>
+
+<!-- Client-side Toast Notification Script -->
+<script>
+ const params = new URLSearchParams(window.location.search);
+ const notice = params.get("notice");
+ const messages = {
+  updated: "Data SMS berhasil diperbarui dan diprediksi ulang.",
+  deleted: "Data prediksi berhasil dihapus.",
+  notfound: "Data tidak ditemukan.",
+  empty: "Teks SMS tidak boleh kosong."
+ };
+ if (notice && messages[notice]) {
+  window.addEventListener("DOMContentLoaded", () => {
+   const toast = document.createElement("div");
+   toast.className = "toast";
+   toast.textContent = messages[notice];
+   document.body.appendChild(toast);
+   setTimeout(() => toast.classList.add("show"), 20);
+   setTimeout(() => toast.remove(), 3500);
+  });
+ }
+</script>
+
+</body>
+</html>

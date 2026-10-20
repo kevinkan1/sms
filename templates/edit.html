@@ -1,0 +1,38 @@
+{% extends "base.html" %}
+{% block title %}Edit SMS{% endblock %}
+{% block breadcrumb %}Riwayat / Edit SMS{% endblock %}
+{% block content %}
+
+<!-- Section: Page Heading -->
+<section class="page-heading">
+ <div>
+  <div class="eyebrow">PEMUTAKHIRAN DATA</div>
+  <h1>Edit SMS #{{ record.id }}</h1>
+  <p>Setelah teks diubah, model akan menjalankan prediksi ulang.</p>
+ </div>
+ <a class="btn btn-outline" href="/history-page">← Kembali ke riwayat</a>
+</section>
+
+<!-- Section: Edit Form Panel -->
+<section class="panel edit-panel">
+ <form method="post" action="/edit/{{ record.id }}">
+  
+  <label for="message_text">Teks pesan SMS <span class="required">*</span></label>
+  <textarea id="message_text" name="message_text" rows="8" maxlength="10000" required>{{ record.message_text }}</textarea>
+  
+  <div class="current-result">
+   Prediksi saat ini: 
+   <span class="badge {{ 'badge-spam' if record.prediction_label == 'spam' else 'badge-ham' }}">
+    {{ record.prediction_label|upper }}
+   </span>
+  </div>
+  
+  <div class="form-actions">
+   <button class="btn btn-primary" type="submit">Simpan dan Prediksi Ulang</button>
+   <a class="btn btn-outline" href="/history-page">Batal</a>
+  </div>
+  
+ </form>
+</section>
+
+{% endblock %}
